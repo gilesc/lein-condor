@@ -70,6 +70,24 @@
      "when_to_transfer_output = ON_EXIT"
      "queue"])))
 
+(defmulti submit-job #(if-let [file (java.io.File. (:input %))]
+                        (or (.isDirectory file) nil)))
+
+(defmethod submit-job true
+  ([config]
+     {:pre [(.isDirectory (java.io.File. (config :input)))
+            (.isDirectory (java.io.File. (config :output)))]}
+     (doseq [file (.listFiles (java.io.File. (config :input)))]
+       (submit-job (merge config
+                          {:input (.getPath file)
+                           :output (java.io.File. (config :output)
+                                                  (str (.getName file) ".out"))})))))
+
+(defmethod submit-job :default [config]
+  (spit "condor.cfg" (make-jobspec config))
+  (shell/sh "sh" "-c" "condor_submit condor.cfg"))
+
+
 (defn condor [project & args]
   (let [uberjar-name (get-default-uberjar-name project)
         config (assoc (parse-configuration args)
@@ -84,6 +102,5 @@
     (let [class-file (get-class-file config)]
       (jio/copy class-file
                 (java.io.File. (.getName class-file))))
-    (spit "condor.cfg" (make-jobspec config))
-    (shell/sh "sh" "-c" "condor_submit condor.cfg")))
+    (submit-job config)))
 
