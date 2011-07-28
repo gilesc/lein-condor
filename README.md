@@ -59,8 +59,8 @@ suppose you have a directory tree like:
         data/input/ac
         data/output
 
-Where aa, ab, and ac are files with data similar to that in input.txt. 
-You can then run:
+Where aa, ab, and ac are files with data similar to that in input.txt
+(hint: GNU split is good for this). You can then run:
     
     lein condor -i data/input -o data/output example.core
 
