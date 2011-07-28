@@ -69,7 +69,6 @@
                        {:aot (conj (project :aot [])
                                    (symbol (:main-class config)))
                         :main (symbol (:main-class config))})]
-    (prn project)
     (uberjar project)
     ;;Condor requires that the main-class class file actually be in the top-level
     ;;directory (...)
