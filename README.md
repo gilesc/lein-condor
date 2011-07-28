@@ -67,12 +67,18 @@ Where aa, ab, and ac are files with data similar to that in input.txt
 and data/output will be automagically populated with files aa.out,
 ab.out, etc. Remember, though, arguments to BOTH -i and -o must be
 either files or directories. Mixing the two will cause an error.
+Another thing to keep in mind is that Condor's network file sharing
+can get overwhelmed when you submit too many large input files in
+quick succession.  If this is the case, your log file will show errors
+to this effect, and you can specify a larger delay with the -d switch
+(e.g., -d 5 = 5 second delay between jobs).
 
 ## More options
 
 *  Specify a logfile: "-l logfile.txt "
 *  Specify an error output file: "-e errors.txt"
 *  Specify a platform: "-p LINUX"
+*  Specify a delay between multiple submissions "-d 5"
 *  Add command-line arguments: "lein condor [...] example.core arg1 arg2
 
 ## TODO

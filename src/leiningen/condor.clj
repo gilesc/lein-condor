@@ -14,6 +14,7 @@
     [platform p "Required platform (e.g., LINUX or WINNT61)" nil]
     [error e "Error file"]
     [log l "Log file"]
+    [delay d "Delay between submits in seconds"]
     remaining])
 
 (defn parse-configuration [args]
@@ -39,6 +40,8 @@
   (format "log = %s" log-file))
 (defmethod config-line :uberjar [[_ uberjar-file]]
   (format "jar_files = %s" uberjar-file))
+(defmethod config-line :jvm-opts [[_ opts]]
+  (str "java_extra_arguments = " (string/join " " opts)))
 (defmethod config-line :default [[_ _]]
   nil)
 
@@ -81,17 +84,24 @@
        (submit-job (merge config
                           {:input (.getPath file)
                            :output (java.io.File. (config :output)
-                                                  (str (.getName file) ".out"))})))))
+                                                  (str (.getName file) ".out"))}))
+       (Thread/sleep (or (* 1000
+                            (Integer/parseInt
+                             (config :delay)))
+                         1000)))))
 
 (defmethod submit-job :default [config]
   (spit "condor.cfg" (make-jobspec config))
+  (println "Submitting input: " (config :input))
   (shell/sh "sh" "-c" "condor_submit condor.cfg"))
 
 
 (defn condor [project & args]
   (let [uberjar-name (get-default-uberjar-name project)
-        config (assoc (parse-configuration args)
-                 :uberjar uberjar-name)
+        config (merge (parse-configuration args)
+                      {:uberjar uberjar-name}
+                      (if (project :jvm-opts)
+                        {:jvm-opts (project :jvm-opts)}))
         project (merge project
                        {:aot (conj (project :aot [])
                                    (symbol (:main-class config)))
