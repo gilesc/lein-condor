@@ -1,6 +1,6 @@
 # lein-condor
 
-FIXME: write description
+Parallelize Clojure functions on a Condor cluster.
 
 ## Requirements
 
@@ -53,8 +53,8 @@ following in output.txt:
 
 ## TODO
 
-Allow wildcards / directories for input and output.
-Allow specification of preferred remote machines.
+*  Allow wildcards / directories for input and output.
+*  Allow specification of preferred remote machines.
 
 ## License
 
