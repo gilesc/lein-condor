@@ -42,6 +42,15 @@
 (defmethod config-line :default [[_ _]]
   nil)
 
+(defn get-class-file [config]
+  (java.io.File.
+   (str "classes/"
+        (.replace (:main-class config) "." "/") ".class")))
+
+(defn get-class-file-name [config]
+  (str
+   (last (string/split #"\." (:main-class config)))
+   ".class"))
 
 (defn make-jobspec [config]
   (string/join
@@ -49,8 +58,8 @@
    (concat
     ["universe = java"
      (str "executable = "
-          (config :main-class)
-          ".class")
+          (.getName
+           (get-class-file config)))
      (str "arguments = "
           (config :main-class)
           " "
@@ -72,13 +81,9 @@
     (uberjar project)
     ;;Condor requires that the main-class class file actually be in the top-level
     ;;directory (...)
-    (let [class-file (str
-                      (last (string/split #"\." (:main-class config)))
-                      ".class")]
-      (jio/copy (java.io.File.
-                 (str "classes/"
-                      (.replace (:main-class config) "." "/") ".class"))
-                (java.io.File. class-file)))    
+    (let [class-file (get-class-file config)]
+      (jio/copy class-file
+                (java.io.File. (.getName class-file))))
     (spit "condor.cfg" (make-jobspec config))
     (shell/sh "sh" "-c" "condor_submit condor.cfg")))
 

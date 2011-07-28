@@ -25,9 +25,11 @@ Add lein-condor to your dev-dependencies:
         :dev-dependencies [[lein-condor "1.0.0-SNAPSHOT"]])
 
 Next, write the Clojure function you'd like to parallelize as the
--main method of a namespace that reads data from stdin, like so:
+-main method of a namespace that reads data from stdin, like so
+(gen-class is also required):
 
-      (ns example.core)
+      (ns example.core
+          (:gen-class))
       (defn -main []
             (doseq [line (line-seq (java.io.BufferedReader. *in*))]
                    (println "Hello, " line)))
