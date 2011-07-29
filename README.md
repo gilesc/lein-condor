@@ -23,7 +23,7 @@ available](http://www.cs.wisc.edu/condor/downloads-v2/download.pl).
 Add lein-condor to your dev-dependencies:
 
     (ns example
-        :dev-dependencies [[lein-condor "1.0.0-SNAPSHOT"]])
+        :dev-dependencies [[lein-condor "1.0.1-SNAPSHOT"]])
 
 Next, write the Clojure function you'd like to parallelize as the
 -main method of a namespace that reads data from stdin, like so
